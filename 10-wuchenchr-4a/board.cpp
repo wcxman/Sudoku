@@ -133,6 +133,7 @@ void board::setCell(ValueType val, int i, int j)
 {
 	if (i >= 1 && i <= BoardSize && j >= 1 && j <= BoardSize)
 		value[i][j] = val;
+		getConflicts();
 	else
 		throw rangeError("bad value in getCell");
 }
@@ -143,6 +144,17 @@ bool board::isBlank(int i, int j)
 	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
 		throw rangeError("bad value in setCell");
 	return (getCell(i, j) == Blank);
+}
+
+// clear the cell
+void board::clearCell(int i, int j)
+{
+    if (i >= 1 && i <= BoardSize && j >= 1 && j <= BoardSize) {
+        value[i][j] = Blank;
+        getConflicts();
+    } else {
+        throw rangeError("bad value in clearCell");
+    }
 }
 
 void board::print()
@@ -194,6 +206,7 @@ int main()
 		while (fin && fin.peek() != 'Z')
 		{
 			b1.initialize(fin);
+			cout << "Initial Board:" << endl;
 			b1.print();
 			b1.printConflicts();
 		}
