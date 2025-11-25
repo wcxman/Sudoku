@@ -30,6 +30,10 @@ public:
 	bool isBlank(int, int);
 	ValueType getCell(int, int);
 	void setCell(ValueType, int, int);
+	void clearCell(int, int);
+    void updateConflicts();
+    void printConflicts();
+    bool isSolved();
 	bool getConflicts();
 
 private:
@@ -69,21 +73,42 @@ bool board::getConflicts()
 //Gets the conflicts that are on the board and updates the board
 {
 	bool tor = false;
+	// First reset all conflicts
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            for (int k = 0; k < 9; k++) {
+                conflicts[i][j][k] = false;
+            }
+        }
+    }
+	
 	for (int row = 1; row <= 9; row++) { //Row of cell being examined
 		for (int col = 1; col <= 9; col++) { //Col of cell being examined
-			for (int i = 1; i <= 9; i++) { //Checks the value of each square in row for conflict
-				if (i != col) {
-					conflicts[row - 1][col - 1][getCell(row, i)-1] = true;
+				for (int i = 1; i <= 9; i++) { //Checks the value of each square in row for conflict
+						if (i != col && !isBlank(row, i)) {
+							conflicts[row - 1][col - 1][getCell(row, i)-1] = true;
+						}
+					}
+				
+				for (int i = 1; i <= 9; i++) { //Checks the value of each square in col for conflict
+					if (i != row && !isBlank(i, col)) {
+						conflicts[row - 1][col - 1][getCell(i, col) - 1] = true;
+					}
+				}
+				//TO-DO: CHECK FOR CONFLICTS IN SQUARE
+				int startRow = ((row - 1) / 3) * 3 + 1;
+           		int startCol = ((col - 1) / 3) * 3 + 1;
+            
+            	for (int r = startRow; r < startRow + 3; r++) {
+                	for (int c = startCol; c < startCol + 3; c++) {
+                    	if ((r != row || c != col) && !isBlank(r, c)) {
+                        conflicts[row - 1][col - 1][getCell(r, c)-1] = true;
+						}
+					}
 				}
 			}
-			for (int i = 1; i <= 9; i++) { //Checks the value of each square in col for conflict
-				if (i != row) {
-					conflicts[row - 1][col - 1][getCell(i, col) - 1] = true;
-				}
-			}
-			//TO-DO: CHECK FOR CONFLICTS IN SQUARE
 		}
-	}
+		return true;
 }
 
 void board::initialize(ifstream& fin)
